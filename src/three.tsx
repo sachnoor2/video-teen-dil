@@ -101,8 +101,8 @@ export const Sea: React.FC<{ mood?: keyof typeof MOODS }> = ({ mood = "day" }) =
         <div
           style={{
             position: "absolute",
-            inset: 0,
-            transform: "scale(2.02)",
+            inset: -40,
+            transform: "scale(2.12)",
             transformOrigin: "50% 45%",
             background: `linear-gradient(180deg, ${pal.top} 0%, ${pal.mid} 42%, ${pal.deep} 100%)`,
           }}
@@ -110,8 +110,8 @@ export const Sea: React.FC<{ mood?: keyof typeof MOODS }> = ({ mood = "day" }) =
         <div
           style={{
             position: "absolute",
-            inset: 0,
-            transform: "scale(2.02)",
+            inset: -40,
+            transform: "scale(2.12)",
             transformOrigin: "50% 45%",
             background:
               "radial-gradient(ellipse at 50% -8%, rgba(195,242,255,.34), rgba(195,242,255,0) 58%)",

@@ -41,8 +41,8 @@ const S01Title: React.FC<SceneProps> = ({ dur }) => {
       right: 0,
       top: 130,
       textAlign: "center",
-      opacity: interpolate(frame, [0, 18], [0, 1]),
-      transform: `translateY(${interpolate(frame, [0, 24], [40, 0])}px)`,
+      opacity: interpolate(frame, [0, 18], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
+      transform: `translateY(${interpolate(frame, [0, 24], [40, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })}px)`,
     }}
   >
     <div
@@ -65,7 +65,7 @@ const S01Title: React.FC<SceneProps> = ({ dur }) => {
         fontWeight: 600,
         fontSize: 52,
         color: theme.cream,
-        opacity: interpolate(frame, [12, 30], [0, 0.95]),
+        opacity: interpolate(frame, [12, 30], [0, 0.95], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }),
         textShadow: "0 6px 22px rgba(0,0,0,.6)",
       }}
     >
@@ -248,8 +248,8 @@ const S08Blood: React.FC<SceneProps> = ({ dur }) => {
         {[0, 1, 2].map((i) => (
           <Heart
             key={i}
-            x={430 + i * 130}
-            y={330 + (i === 1 ? 40 : 0)}
+            x={600 + i * 140}
+            y={430 + (i === 1 ? 40 : 0)}
             size={i === 1 ? 96 : 82}
             delay={i * 6}
             colour={theme.blue}
@@ -496,7 +496,7 @@ const S16Plan: React.FC<SceneProps> = ({ dur }) => {
 const S17Squeeze: React.FC<SceneProps> = ({ dur }) => {
   const frame = useCurrentFrame();
   const c = cam(frame, dur);
-  const flat = interpolate(frame, [20, 70], [0, 0.92], { extrapolateRight: "clamp" });
+  const flat = interpolate(frame, [20, 70], [0, 0.92], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
   const x = interpolate(frame, [30, 150], [-560, 330], { extrapolateRight: "clamp" });
   return (
     <Stage {...c} ui={<><Narr text="मोती रस्सी जैसा पतला होकर अंदर सरक गया।" /></>}>
