@@ -1,4 +1,4 @@
-name: Render Hindi cartoon
+name: Render Hindi cartoon (3D, chunked)
 
 on:
   workflow_dispatch:
@@ -11,11 +11,12 @@ permissions:
   contents: read
 
 jobs:
-  render:
-    name: Hindi voices + Remotion render
+  plan:
+    name: Voices, typecheck, chunk plan
     runs-on: ubuntu-latest
-    timeout-minutes: 90
-
+    timeout-minutes: 40
+    outputs:
+      chunks: ${{ steps.plan.outputs.chunks }}
     steps:
       - uses: actions/checkout@v4
 
@@ -24,18 +25,14 @@ jobs:
           node-version: "20"
           cache: npm
 
-      - name: Install JS dependencies
-        run: npm ci
+      - run: npm ci
 
       - name: Make sure ffmpeg is available
         run: |
           if ! command -v ffmpeg >/dev/null 2>&1; then
             sudo apt-get update && sudo apt-get install -y ffmpeg
           fi
-          ffmpeg -version | head -1
 
-      # Two clean Hindi Piper voices. Every character is one of these two,
-      # re-pitched and re-paced by scripts/tts_hi.py into five distinct voices.
       - name: Download Piper and the two Hindi voices
         run: |
           set -euo pipefail
@@ -48,27 +45,106 @@ jobs:
             curl -fsSL -o .voices/hi_IN-$v-medium.onnx      "$B/$v/medium/hi_IN-$v-medium.onnx"
             curl -fsSL -o .voices/hi_IN-$v-medium.onnx.json "$B/$v/medium/hi_IN-$v-medium.onnx.json"
           done
-          ls -lh .voices
 
-      - name: Generate the five character voices and the timing manifest
-        run: |
-          python3 scripts/tts_hi.py --piper .piper/piper/piper --voices-dir .voices
-          cat src/manifest.json | head -20
+      - name: Generate the five character voices, envelopes and timing manifest
+        run: python3 scripts/tts_hi.py --piper .piper/piper/piper --voices-dir .voices
 
       - name: Type-check
         run: npx tsc --noEmit
 
-      - name: Render the cartoon
+      - id: plan
         run: |
-          npx remotion render src/index.ts TeenDil \
-            out/teen-dil.mp4 \
-            --gl=swangle --concurrency=3 --log=info
+          CHUNKS=$(python3 scripts/render_chunks.py --plan --json --chunk-seconds 55)
+          echo "chunks=$CHUNKS" >> "$GITHUB_OUTPUT"
+          echo "$CHUNKS" | head -c 400
 
-      - name: Join the narration and verify the MP4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: narration
+          path: |
+            public/audio
+            src/manifest.json
+          retention-days: 7
+
+  render:
+    name: Render chunk ${{ matrix.chunk.index }}
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        chunk: ${{ fromJSON(needs.plan.outputs.chunks) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Make sure ffmpeg is available
+        run: |
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update && sudo apt-get install -y ffmpeg
+          fi
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: narration
+
+      - name: Render this chunk
+        run: python3 scripts/render_chunks.py --only ${{ matrix.chunk.index }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: chunk-${{ matrix.chunk.index }}
+          path: out/chunks/chunk-*.mp4
+          if-no-files-found: error
+          retention-days: 7
+
+  stitch:
+    name: Stitch, verify, upload
+    needs: [plan, render]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Make sure ffmpeg is available
+        run: |
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update && sudo apt-get install -y ffmpeg
+          fi
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: narration
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: chunk-*
+          merge-multiple: true
+          path: out/chunks
+
+      - name: Stitch in order and verify
+        run: |
+          python3 scripts/stitch.py --chunk-seconds 55 --out out/teen-dil.mp4
+          cat out/stitch-report.json || true
+
+      - name: Verify the delivered file
         run: |
           set -euo pipefail
-          ffmpeg -y -hide_banner -loglevel error \
-            -f concat -safe 0 -i public/audio/list.txt -c copy out/narration.wav
           echo "=== container ==="
           ffprobe -v error -show_entries format=duration,size -of default=nw=1 out/teen-dil.mp4
           echo "=== streams ==="
@@ -77,11 +153,11 @@ jobs:
           echo "=== audio level ==="
           ffmpeg -hide_banner -i out/teen-dil.mp4 -t 30 -af volumedetect -f null - 2>&1 | grep -E "mean_volume|max_volume"
 
-      - name: Upload the finished cartoon
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: teen-dil
           path: |
             out/teen-dil.mp4
-            out/narration.wav
+            public/audio/list.txt
           if-no-files-found: error
+          retention-days: 14

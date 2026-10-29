@@ -6,6 +6,7 @@ export type SceneTiming = {
   character: string;
   seconds: number;
   frames: number;
+  env?: string;
 };
 
 export type Manifest = {

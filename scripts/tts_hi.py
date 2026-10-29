@@ -32,6 +32,29 @@ MANIFEST = ROOT / "src" / "manifest.json"
 NARRATION = ROOT / "narration.json"
 
 
+def envelope(path: Path, fps: int) -> str:
+    """One digit per video frame: how loud the voice is, 0-9. Drives the mouth."""
+    import numpy as np
+
+    with wave.open(str(path), "rb") as f:
+        sr = f.getframerate()
+        raw = f.readframes(f.getnframes())
+    x = np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768.0
+    win = max(1, int(sr / fps))
+    rms = []
+    for i in range(0, len(x), win):
+        chunk = x[i:i + win]
+        rms.append(float(np.sqrt((chunk ** 2).mean())) if len(chunk) else 0.0)
+    if not rms:
+        return "0"
+    peak = float(np.percentile(rms, 95)) or 1.0
+    out = []
+    for v in rms:
+        level = min(1.0, v / peak)
+        out.append(str(int(round(level * 9))))
+    return "".join(out)
+
+
 def wav_seconds(path: Path) -> float:
     with wave.open(str(path), "rb") as f:
         return f.getnframes() / float(f.getframerate())
@@ -116,6 +139,7 @@ def main() -> int:
                 "character": who,
                 "seconds": round(seconds, 3),
                 "frames": frames,
+                "env": envelope(out, fps),
             })
             total_frames += frames
             total_seconds += seconds
