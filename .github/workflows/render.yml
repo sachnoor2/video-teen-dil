@@ -97,7 +97,7 @@ jobs:
           name: narration
 
       - name: Render this chunk
-        run: python3 scripts/render_chunks.py --only ${{ matrix.chunk.index }}
+        run: python3 scripts/render_chunks.py --chunk-seconds 55 --only ${{ matrix.chunk.index }}
 
       - uses: actions/upload-artifact@v4
         with:
