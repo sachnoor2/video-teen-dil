@@ -33,26 +33,38 @@ NARRATION = ROOT / "narration.json"
 
 
 def envelope(path: Path, fps: int) -> str:
-    """One digit per video frame: how loud the voice is, 0-9. Drives the mouth."""
-    import numpy as np
+    """One digit per video frame: how loud the voice is, 0-9. Drives the mouth.
+
+    Standard library only — audioop when it is there, a plain loop when it is not,
+    so the runner needs no numpy.
+    """
+    import array
 
     with wave.open(str(path), "rb") as f:
         sr = f.getframerate()
         raw = f.readframes(f.getnframes())
-    x = np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32768.0
-    win = max(1, int(sr / fps))
-    rms = []
-    for i in range(0, len(x), win):
-        chunk = x[i:i + win]
-        rms.append(float(np.sqrt((chunk ** 2).mean())) if len(chunk) else 0.0)
+
+    try:
+        import audioop  # deprecated in 3.13 but present on 3.12
+
+        def level(b: bytes) -> int:
+            return audioop.rms(b, 2) if b else 0
+    except Exception:  # noqa: BLE001 - fall back to a plain loop
+
+        def level(b: bytes) -> int:
+            a = array.array("h")
+            a.frombytes(b)
+            if not a:
+                return 0
+            return int((sum(x * x for x in a) / len(a)) ** 0.5)
+
+    win = max(2, (sr // fps) * 2)
+    rms = [level(raw[i:i + win]) for i in range(0, len(raw), win)]
     if not rms:
         return "0"
-    peak = float(np.percentile(rms, 95)) or 1.0
-    out = []
-    for v in rms:
-        level = min(1.0, v / peak)
-        out.append(str(int(round(level * 9))))
-    return "".join(out)
+    ordered = sorted(rms)
+    peak = ordered[min(len(ordered) - 1, int(len(ordered) * 0.95))] or 1
+    return "".join(str(min(9, int(round((v / peak) * 9)))) for v in rms)
 
 
 def wav_seconds(path: Path) -> float:
