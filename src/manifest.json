@@ -1,0 +1,198 @@
+{
+  "fps": 30,
+  "engine": "piper-multivoice-hi",
+  "lang": "hi",
+  "totalSeconds": 284.01,
+  "totalFrames": 9126,
+  "scenes": [
+    {
+      "id": "01-title",
+      "audio": "audio/01-title.wav",
+      "character": "narrator",
+      "seconds": 12.039,
+      "frames": 384
+    },
+    {
+      "id": "02-reef",
+      "audio": "audio/02-reef.wav",
+      "character": "narrator",
+      "seconds": 11.389,
+      "frames": 364
+    },
+    {
+      "id": "03-morning",
+      "audio": "audio/03-morning.wav",
+      "character": "moti",
+      "seconds": 11.36,
+      "frames": 363
+    },
+    {
+      "id": "04-friend",
+      "audio": "audio/04-friend.wav",
+      "character": "chimti",
+      "seconds": 10.297,
+      "frames": 331
+    },
+    {
+      "id": "05-hearts",
+      "audio": "audio/05-hearts.wav",
+      "character": "moti",
+      "seconds": 10.71,
+      "frames": 344
+    },
+    {
+      "id": "06-mock",
+      "audio": "audio/06-mock.wav",
+      "character": "toothu",
+      "seconds": 9.559,
+      "frames": 309
+    },
+    {
+      "id": "07-dadi",
+      "audio": "audio/07-dadi.wav",
+      "character": "dadi",
+      "seconds": 13.621,
+      "frames": 431
+    },
+    {
+      "id": "08-blood",
+      "audio": "audio/08-blood.wav",
+      "character": "dadi",
+      "seconds": 14.295,
+      "frames": 451
+    },
+    {
+      "id": "09-taste",
+      "audio": "audio/09-taste.wav",
+      "character": "moti",
+      "seconds": 11.407,
+      "frames": 365
+    },
+    {
+      "id": "10-arms",
+      "audio": "audio/10-arms.wav",
+      "character": "moti",
+      "seconds": 11.3,
+      "frames": 362
+    },
+    {
+      "id": "11-stop",
+      "audio": "audio/11-stop.wav",
+      "character": "dadi",
+      "seconds": 13.133,
+      "frames": 416
+    },
+    {
+      "id": "12-warning",
+      "audio": "audio/12-warning.wav",
+      "character": "dadi",
+      "seconds": 12.971,
+      "frames": 412
+    },
+    {
+      "id": "13-storm",
+      "audio": "audio/13-storm.wav",
+      "character": "narrator",
+      "seconds": 10.123,
+      "frames": 326
+    },
+    {
+      "id": "14-trapped",
+      "audio": "audio/14-trapped.wav",
+      "character": "chimti",
+      "seconds": 8.1,
+      "frames": 265
+    },
+    {
+      "id": "15-flee",
+      "audio": "audio/15-flee.wav",
+      "character": "toothu",
+      "seconds": 6.959,
+      "frames": 231
+    },
+    {
+      "id": "16-plan",
+      "audio": "audio/16-plan.wav",
+      "character": "moti",
+      "seconds": 8.886,
+      "frames": 289
+    },
+    {
+      "id": "17-squeeze",
+      "audio": "audio/17-squeeze.wav",
+      "character": "narrator",
+      "seconds": 9.787,
+      "frames": 316
+    },
+    {
+      "id": "18-inside",
+      "audio": "audio/18-inside.wav",
+      "character": "moti",
+      "seconds": 11.662,
+      "frames": 372
+    },
+    {
+      "id": "19-colour",
+      "audio": "audio/19-colour.wav",
+      "character": "moti",
+      "seconds": 10.176,
+      "frames": 328
+    },
+    {
+      "id": "20-arms-work",
+      "audio": "audio/20-arms-work.wav",
+      "character": "moti",
+      "seconds": 9.712,
+      "frames": 314
+    },
+    {
+      "id": "21-hearts-work",
+      "audio": "audio/21-hearts-work.wav",
+      "character": "narrator",
+      "seconds": 10.483,
+      "frames": 337
+    },
+    {
+      "id": "22-pulling",
+      "audio": "audio/22-pulling.wav",
+      "character": "narrator",
+      "seconds": 8.149,
+      "frames": 267
+    },
+    {
+      "id": "23-free",
+      "audio": "audio/23-free.wav",
+      "character": "chimti",
+      "seconds": 7.195,
+      "frames": 238
+    },
+    {
+      "id": "24-sorry",
+      "audio": "audio/24-sorry.wav",
+      "character": "toothu",
+      "seconds": 9.002,
+      "frames": 293
+    },
+    {
+      "id": "25-celebrate",
+      "audio": "audio/25-celebrate.wav",
+      "character": "narrator",
+      "seconds": 8.65,
+      "frames": 282
+    },
+    {
+      "id": "26-proud",
+      "audio": "audio/26-proud.wav",
+      "character": "dadi",
+      "seconds": 12.422,
+      "frames": 395
+    },
+    {
+      "id": "27-recap",
+      "audio": "audio/27-recap.wav",
+      "character": "narrator",
+      "seconds": 10.623,
+      "frames": 341
+    }
+  ]
+}

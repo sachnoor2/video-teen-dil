@@ -1,0 +1,24 @@
+{
+  "name": "video-teen-dil",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Teen Dil — a five minute Hindi 3D-look cartoon about a small octopus with three hearts, narrated by five distinct Hindi character voices",
+  "scripts": {
+    "dev": "remotion studio src/index.ts",
+    "tts": "python3 scripts/tts_hi.py --piper .piper/piper/piper --voices-dir .voices",
+    "typecheck": "tsc --noEmit",
+    "render": "remotion render src/index.ts TeenDil out/teen-dil.mp4 --gl=swangle"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.539",
+    "@remotion/google-fonts": "4.0.539",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.539"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "typescript": "5.6.3"
+  }
+}
