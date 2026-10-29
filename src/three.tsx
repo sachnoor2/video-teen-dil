@@ -31,28 +31,32 @@ export const Stage: React.FC<{
   yaw?: number;
   pitch?: number;
   zoom?: number;
+  /** Text lives here, outside the perspective space, so it can never be
+   *  magnified or shifted off frame by a depth layer. */
+  ui?: React.ReactNode;
   children: React.ReactNode;
-}> = ({ yaw = 0, pitch = 0, zoom = 0, children }) => (
-  <div
-    style={{
-      position: "absolute",
-      inset: 0,
-      perspective: 1500,
-      perspectiveOrigin: "50% 45%",
-      overflow: "hidden",
-      background: theme.waterDeep,
-    }}
-  >
+}> = ({ yaw = 0, pitch = 0, zoom = 0, ui, children }) => (
+  <div style={{ position: "absolute", inset: 0, overflow: "hidden", background: theme.waterDeep }}>
     <div
       style={{
         position: "absolute",
         inset: 0,
-        transformStyle: "preserve-3d",
-        transform: `translateZ(${zoom}px) rotateX(${pitch}deg) rotateY(${yaw}deg)`,
+        perspective: 1500,
+        perspectiveOrigin: "50% 45%",
       }}
     >
-      {children}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          transformStyle: "preserve-3d",
+          transform: `translateZ(${zoom}px) rotateX(${pitch}deg) rotateY(${yaw}deg)`,
+        }}
+      >
+        {children}
+      </div>
     </div>
+    {ui ? <div style={{ position: "absolute", inset: 0, zIndex: 20 }}>{ui}</div> : null}
   </div>
 );
 
@@ -92,33 +96,31 @@ export const Sea: React.FC<{ mood?: keyof typeof MOODS }> = ({ mood = "day" }) =
   return (
     <>
       <Layer z={-1500}>
+        {/* This layer sits 1500px back, so perspective shrinks it by half.
+            Scaling it back up keeps it full-bleed without a giant raster layer. */}
         <div
           style={{
             position: "absolute",
             inset: 0,
+            transform: "scale(2.02)",
+            transformOrigin: "50% 45%",
             background: `linear-gradient(180deg, ${pal.top} 0%, ${pal.mid} 42%, ${pal.deep} 100%)`,
           }}
         />
-        {[0, 1, 2, 3, 4].map((i) => (
-          <div
-            key={i}
-            style={{
-              position: "absolute",
-              top: -260,
-              left: 90 + i * 390 + Math.sin(frame / 90 + i) * 18,
-              width: 150,
-              height: 1600,
-              background: "linear-gradient(180deg, rgba(200,245,255,.26), rgba(200,245,255,0))",
-              transform: `rotate(${-9 + i * 4}deg) skewX(-7deg)`,
-              filter: "blur(16px)",
-              opacity: pal.shaft,
-            }}
-          />
-        ))}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            transform: "scale(2.02)",
+            transformOrigin: "50% 45%",
+            background:
+              "radial-gradient(ellipse at 50% -8%, rgba(195,242,255,.34), rgba(195,242,255,0) 58%)",
+          }}
+        />
       </Layer>
 
       {/* far reef ridge */}
-      <Layer z={-1100}>
+      <Layer z={-620}>
         {[0, 1, 2, 3, 4, 5].map((i) => (
           <div
             key={i}
@@ -129,15 +131,15 @@ export const Sea: React.FC<{ mood?: keyof typeof MOODS }> = ({ mood = "day" }) =
               width: 520,
               height: 420 + (i % 3) * 130,
               borderRadius: "50% 50% 0 0 / 70% 70% 0 0",
-              background: `linear-gradient(180deg, ${shade(pal.mid, 22)}, ${pal.deep})`,
-              opacity: 0.85,
+              background: `linear-gradient(180deg, ${shade(pal.mid, 34)}, ${pal.mid} 60%, ${pal.deep})`,
+              opacity: 0.9,
             }}
           />
         ))}
       </Layer>
 
       {/* mid rocks + kelp */}
-      <Layer z={-650}>
+      <Layer z={-340}>
         {[0, 1, 2, 3].map((i) => (
           <div
             key={`r${i}`}
@@ -148,8 +150,10 @@ export const Sea: React.FC<{ mood?: keyof typeof MOODS }> = ({ mood = "day" }) =
               width: 330,
               height: 300 + (i % 2) * 90,
               borderRadius: "46% 54% 8% 8% / 60% 58% 6% 6%",
-              background: `radial-gradient(circle at 38% 22%, ${theme.rockLight}, ${theme.rock} 62%, ${shade(theme.rock, -26)})`,
-              boxShadow: "0 30px 60px rgba(0,0,0,.4)",
+              background:
+                "radial-gradient(ellipse at 34% 12%, #55899f 0%, #2f5468 34%, #17323f 74%, #0a1e2a 100%)",
+              boxShadow:
+                "inset 0 4px 0 rgba(198,240,255,.16), inset -18px -20px 44px rgba(0,0,0,.45), 0 30px 60px rgba(0,0,0,.45)",
             }}
           />
         ))}
@@ -173,6 +177,21 @@ export const Sea: React.FC<{ mood?: keyof typeof MOODS }> = ({ mood = "day" }) =
             />
           );
         })}
+      </Layer>
+
+      {/* sand floor */}
+      <Layer z={-520}>
+        <div
+          style={{
+            position: "absolute",
+            left: -260,
+            right: -260,
+            bottom: -140,
+            height: 620,
+            background:
+              "radial-gradient(ellipse at 50% 100%, rgba(255,214,150,.24) 0%, rgba(255,214,150,.10) 42%, rgba(255,214,150,0) 72%)",
+          }}
+        />
       </Layer>
     </>
   );
@@ -348,7 +367,7 @@ export const Octo: React.FC<{
           left: 0,
           top: 0,
           transformStyle: "preserve-3d",
-          transform: `scale(${breathe})`,
+          transform: `scale(${breathe}) rotateY(${Math.sin(frame / 62) * 11}deg)`,
         }}
       >
         {/* arms */}
@@ -598,7 +617,7 @@ export const Turtle: React.FC<{
         left: "50%",
         top: "50%",
         transformStyle: "preserve-3d",
-        transform: `translate3d(${x}px, ${y + drift}px, ${z}px) scale(${scale}) rotate(${drift * 0.2}deg)`,
+        transform: `translate3d(${x}px, ${y + drift}px, ${z}px) scale(${scale}) rotate(${drift * 0.2}deg) rotateY(${Math.sin(frame / 70 + phase) * 10}deg)`,
       }}
     >
       {/* flippers */}
@@ -717,7 +736,7 @@ export const Barracuda: React.FC<{
         left: "50%",
         top: "50%",
         transformStyle: "preserve-3d",
-        transform: `translate3d(${x}px, ${y + sway * 8}px, ${z}px) scale(${scale}) scaleX(${flip ? -1 : 1}) rotate(${sway * 2.5}deg)`,
+        transform: `translate3d(${x}px, ${y + sway * 8}px, ${z}px) scale(${scale}) scaleX(${flip ? -1 : 1}) rotate(${sway * 2.5}deg) rotateY(${Math.sin(frame / 66 + phase) * 9}deg)`,
       }}
     >
       {/* tail */}
@@ -980,7 +999,7 @@ export const RockGap: React.FC<{ x?: number; y?: number; z?: number; scale?: num
           width: rw,
           height: rh,
           borderRadius: "44% 56% 18% 18% / 46% 54% 12% 12%",
-          background: `radial-gradient(circle at 36% 20%, ${theme.rockLight}, ${theme.rock} 58%, ${shade(theme.rock, -30)} 100%)`,
+          background: "radial-gradient(ellipse at 34% 12%, #55899f 0%, #2f5468 36%, #17323f 76%, #0a1e2a 100%)",
           boxShadow: "inset -18px -18px 40px rgba(0,0,0,.4), 0 26px 46px rgba(0,0,0,.4)",
         }}
       />
@@ -1026,9 +1045,9 @@ export const Title: React.FC<{ main: string; sub?: string; delay?: number }> = (
     >
       <div
         style={{
-          fontFamily: display,
-          fontWeight: 800,
-          fontSize: 190,
+          fontFamily: body,
+          fontWeight: 700,
+          fontSize: 150,
           lineHeight: 1.05,
           color: theme.gold,
           textShadow:
@@ -1068,7 +1087,7 @@ export const Say: React.FC<{
   delay?: number;
   tail?: "left" | "right";
   z?: number;
-}> = ({ name, text, colour = theme.coral, x = 150, y = 90, w = 860, delay = 6, tail = "left", z = 500 }) => {
+}> = ({ name, text, colour = theme.coral, x = 140, y = 96, w = 820, delay = 6, tail = "left", z = 0 }) => {
   const frame = useCurrentFrame();
   const t = enter(frame, delay, 16);
   return (
@@ -1141,7 +1160,7 @@ export const Narr: React.FC<{ text: string; delay?: number }> = ({ text, delay =
         position: "absolute",
         left: 0,
         right: 0,
-        bottom: 54,
+        bottom: 78,
         display: "flex",
         justifyContent: "center",
         transform: `translateY(${(1 - t) * 26}px)`,

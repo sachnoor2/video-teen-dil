@@ -25,7 +25,7 @@ export type SceneProps = { dur: number };
 const cam = (frame: number, dur: number) => ({
   yaw: Math.sin(frame / 105) * 4.5,
   pitch: -1.5 + Math.sin(frame / 138) * 1.2,
-  zoom: -50 + (70 * frame) / Math.max(1, dur),
+  zoom: 4 + (34 * frame) / Math.max(1, dur),
 });
 
 /* 01 — title ------------------------------------------------------- */
@@ -33,51 +33,50 @@ const S01Title: React.FC<SceneProps> = ({ dur }) => {
   const frame = useCurrentFrame();
   const c = cam(frame, dur);
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<>
+  <div
+    style={{
+      position: "absolute",
+      left: 0,
+      right: 0,
+      top: 130,
+      textAlign: "center",
+      opacity: interpolate(frame, [0, 18], [0, 1]),
+      transform: `translateY(${interpolate(frame, [0, 24], [40, 0])}px)`,
+    }}
+  >
+    <div
+      style={{
+        fontFamily: body,
+        fontWeight: 800,
+        fontSize: 156,
+        lineHeight: 1.05,
+        color: theme.gold,
+        textShadow:
+          "0 8px 0 rgba(120,60,10,.35), 0 24px 54px rgba(0,0,0,.6), 0 0 90px rgba(253,230,138,.5)",
+      }}
+    >
+      तीन दिल
+    </div>
+    <div
+      style={{
+        marginTop: 6,
+        fontFamily: body,
+        fontWeight: 600,
+        fontSize: 52,
+        color: theme.cream,
+        opacity: interpolate(frame, [12, 30], [0, 0.95]),
+        textShadow: "0 6px 22px rgba(0,0,0,.6)",
+      }}
+    >
+      एक छोटे ऑक्टोपस की कहानी
+    </div>
+  </div>
+      </>}>
       <Sea mood="day" />
       <Bubbles n={24} />
       <Layer z={-300}>
         <Octo y={250} scale={1.35} mood="calm" />
-      </Layer>
-      <Layer z={200}>
-        <div
-          style={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            top: 96,
-            textAlign: "center",
-            opacity: interpolate(frame, [0, 18], [0, 1]),
-            transform: `translateY(${interpolate(frame, [0, 24], [40, 0])}px)`,
-          }}
-        >
-          <div
-            style={{
-              fontFamily: display,
-              fontWeight: 800,
-              fontSize: 200,
-              lineHeight: 1.05,
-              color: theme.gold,
-              textShadow:
-                "0 8px 0 rgba(120,60,10,.35), 0 24px 54px rgba(0,0,0,.6), 0 0 90px rgba(253,230,138,.5)",
-            }}
-          >
-            तीन दिल
-          </div>
-          <div
-            style={{
-              marginTop: 6,
-              fontFamily: body,
-              fontWeight: 600,
-              fontSize: 52,
-              color: theme.cream,
-              opacity: interpolate(frame, [12, 30], [0, 0.95]),
-              textShadow: "0 6px 22px rgba(0,0,0,.6)",
-            }}
-          >
-            एक छोटे ऑक्टोपस की कहानी
-          </div>
-        </div>
       </Layer>
       <Vignette strength={0.45} />
     </Stage>
@@ -89,18 +88,17 @@ const S02Reef: React.FC<SceneProps> = ({ dur }) => {
   const frame = useCurrentFrame();
   const c = cam(frame, dur);
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<><Narr text="लाल चट्टानों के बीच रहता था मोती।" /></>}>
       <Sea mood="day" />
       <Bubbles n={28} />
       <Layer z={-250}>
         <Fish x={-520} y={-160} scale={0.7} flip phase={0.4} />
         <Fish x={540} y={-70} scale={0.55} colour={theme.teal} phase={2.1} />
-        <Fish x={-380} y={90} scale={0.45} colour="#f7c948" phase={3.4} />
+        <Fish x={-380} y={104} scale={0.45} colour="#f7c948" phase={3.4} />
       </Layer>
       <Layer z={120}>
         <Octo y={130} scale={0.95} mood="calm" />
       </Layer>
-      <Narr text="लाल चट्टानों के बीच रहता था मोती।" />
       <Vignette strength={0.4} />
     </Stage>
   );
@@ -115,7 +113,7 @@ const S03Morning: React.FC<SceneProps> = ({ dur }) => {
     extrapolateRight: "clamp",
   });
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<><Say name="मोती" text="कोई मुझे देखे, तो मैं पत्थर बन जाता हूँ।" x={140} y={104} w={820} /></>}>
       <Sea mood="day" />
       <Bubbles n={22} />
       <Layer z={-200}>
@@ -135,7 +133,6 @@ const S03Morning: React.FC<SceneProps> = ({ dur }) => {
       <Layer z={-300}>
         <Fish x={560} y={-140} scale={0.5} colour="#f7c948" flip phase={1.4} />
       </Layer>
-      <Say name="मोती" text="कोई मुझे देखे, तो मैं पत्थर बन जाता हूँ।" x={110} y={70} w={820} />
       <Vignette strength={0.4} />
     </Stage>
   );
@@ -147,7 +144,14 @@ const S04Friend: React.FC<SceneProps> = ({ dur }) => {
   const c = cam(frame, dur);
   const hop = Math.abs(Math.sin(frame / 13)) * 18;
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<><Say
+        name="चिमटी"
+        colour={theme.coralDeep}
+        text="मोती! आज तुम किस रंग के हो? मुझे तुम्हारा हर रंग पसंद है।"
+        x={140}
+        y={104}
+        w={880}
+      /></>}>
       <Sea mood="day" />
       <Bubbles n={26} />
       <Layer z={-120}>
@@ -156,14 +160,6 @@ const S04Friend: React.FC<SceneProps> = ({ dur }) => {
       <Layer z={140}>
         <Octo x={260} y={230} scale={0.95} mood="happy" />
       </Layer>
-      <Say
-        name="चिमटी"
-        colour={theme.coralDeep}
-        text="मोती! आज तुम किस रंग के हो? मुझे तुम्हारा हर रंग पसंद है।"
-        x={110}
-        y={70}
-        w={880}
-      />
       <Vignette strength={0.36} />
     </Stage>
   );
@@ -174,13 +170,12 @@ const S05Hearts: React.FC<SceneProps> = ({ dur }) => {
   const frame = useCurrentFrame();
   const c = cam(frame, dur);
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<><Say name="मोती" text="मेरे तीन दिल हैं! एक यहाँ, दो यहाँ।" x={120} y={104} w={820} /></>}>
       <Sea mood="dusk" />
       <Bubbles n={20} />
       <Layer z={100}>
         <Octo y={230} scale={1.2} mood="calm" showHearts />
       </Layer>
-      <Say name="मोती" text="मेरे तीन दिल हैं! एक यहाँ, दो यहाँ।" x={120} y={80} w={820} />
       <Vignette strength={0.4} />
     </Stage>
   );
@@ -191,7 +186,7 @@ const S06Mock: React.FC<SceneProps> = ({ dur }) => {
   const frame = useCurrentFrame();
   const c = cam(frame, dur);
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<><Say name="टूथू" colour={theme.rockLight} text="तुम इस समुद्र के सबसे बेतुके जीव हो!" x={120} y={104} w={860} /></>}>
       <Sea mood="dusk" />
       <Bubbles n={18} />
       <Layer z={-100}>
@@ -200,7 +195,6 @@ const S06Mock: React.FC<SceneProps> = ({ dur }) => {
       <Layer z={160}>
         <Barracuda x={210} y={-60} scale={0.95} flip phase={1.2} />
       </Layer>
-      <Say name="टूथू" colour={theme.rockLight} text="तुम इस समुद्र के सबसे बेतुके जीव हो!" x={120} y={90} w={860} />
       <Vignette strength={0.45} />
     </Stage>
   );
@@ -211,7 +205,14 @@ const S07Dadi: React.FC<SceneProps> = ({ dur }) => {
   const frame = useCurrentFrame();
   const c = cam(frame, dur);
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<><Say
+        name="दादी कछुई"
+        colour="#5f7f45"
+        text="दो दिल गलफड़ों को खून पहुँचाते हैं। तीसरा दिल बाकी शरीर को।"
+        x={140}
+        y={104}
+        w={900}
+      /></>}>
       <Sea mood="day" />
       <Bubbles n={22} />
       <Layer z={-120}>
@@ -220,14 +221,6 @@ const S07Dadi: React.FC<SceneProps> = ({ dur }) => {
       <Layer z={140}>
         <Turtle x={330} y={150} scale={0.95} />
       </Layer>
-      <Say
-        name="दादी कछुई"
-        colour="#5f7f45"
-        text="दो दिल गलफड़ों को खून पहुँचाते हैं। तीसरा दिल बाकी शरीर को।"
-        x={110}
-        y={70}
-        w={900}
-      />
       <Vignette strength={0.4} />
     </Stage>
   );
@@ -238,7 +231,14 @@ const S08Blood: React.FC<SceneProps> = ({ dur }) => {
   const frame = useCurrentFrame();
   const c = cam(frame, dur);
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<><Say
+        name="दादी कछुई"
+        colour="#5f7f45"
+        text="तेरा खून नीला है, क्योंकि उसमें लोहे की जगह ताँबा है।"
+        x={140}
+        y={104}
+        w={880}
+      /></>}>
       <Sea mood="night" />
       <Bubbles n={18} />
       <Layer z={-80}>
@@ -256,14 +256,6 @@ const S08Blood: React.FC<SceneProps> = ({ dur }) => {
           />
         ))}
       </Layer>
-      <Say
-        name="दादी कछुई"
-        colour="#5f7f45"
-        text="तेरा खून नीला है, क्योंकि उसमें लोहे की जगह ताँबा है।"
-        x={110}
-        y={80}
-        w={880}
-      />
       <Vignette strength={0.55} />
     </Stage>
   );
@@ -274,7 +266,7 @@ const S09Taste: React.FC<SceneProps> = ({ dur }) => {
   const frame = useCurrentFrame();
   const c = cam(frame, dur);
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<><Say name="मोती" text="मेरे हाथ चख भी सकते हैं! हज़ारों स्वाद केंद्र।" x={140} y={104} w={860} /></>}>
       <Sea mood="day" />
       <Bubbles n={24} />
       <Layer z={160}>
@@ -303,7 +295,6 @@ const S09Taste: React.FC<SceneProps> = ({ dur }) => {
           />
         ))}
       </Layer>
-      <Say name="मोती" text="मेरे हाथ चख भी सकते हैं! हज़ारों स्वाद केंद्र।" x={110} y={70} w={860} />
       <Vignette strength={0.38} />
     </Stage>
   );
@@ -314,7 +305,7 @@ const S10Arms: React.FC<SceneProps> = ({ dur }) => {
   const frame = useCurrentFrame();
   const c = cam(frame, dur);
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<><Say name="मोती" text="आठ हाथ, और हर हाथ पर चूसने वाले कप।" x={140} y={104} w={820} /></>}>
       <Sea mood="dusk" />
       <Bubbles n={20} />
       <Layer z={140}>
@@ -344,7 +335,6 @@ const S10Arms: React.FC<SceneProps> = ({ dur }) => {
           );
         })}
       </Layer>
-      <Say name="मोती" text="आठ हाथ, और हर हाथ पर चूसने वाले कप।" x={110} y={70} w={820} />
       <Vignette strength={0.42} />
     </Stage>
   );
@@ -355,7 +345,14 @@ const S11Stop: React.FC<SceneProps> = ({ dur }) => {
   const frame = useCurrentFrame();
   const c = cam(frame, dur);
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<><Say
+        name="दादी कछुई"
+        colour="#5f7f45"
+        text="तेज़ तैरने पर तीसरा दिल रुक जाता है। इसीलिए तू रेंगता है।"
+        x={140}
+        y={104}
+        w={900}
+      /></>}>
       <Sea mood="dusk" />
       <Bubbles n={20} />
       <Layer z={120}>
@@ -366,14 +363,6 @@ const S11Stop: React.FC<SceneProps> = ({ dur }) => {
         <Heart x={965} y={300} size={92} delay={6} colour={theme.coral} />
         <Heart x={1065} y={300} size={92} delay={10} colour={theme.coral} dim />
       </Layer>
-      <Say
-        name="दादी कछुई"
-        colour="#5f7f45"
-        text="तेज़ तैरने पर तीसरा दिल रुक जाता है। इसीलिए तू रेंगता है।"
-        x={110}
-        y={70}
-        w={900}
-      />
       <Vignette strength={0.42} />
     </Stage>
   );
@@ -384,7 +373,14 @@ const S12Warning: React.FC<SceneProps> = ({ dur }) => {
   const frame = useCurrentFrame();
   const c = cam(frame, dur);
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<><Say
+        name="दादी कछुई"
+        colour="#5f7f45"
+        text="जाल में जितना हिलोगे, उतना उलझोगे। शांत रहना, और रास्ता ढूँढना।"
+        x={140}
+        y={104}
+        w={920}
+      /></>}>
       <Sea mood="dusk" />
       <Bubbles n={16} />
       <Layer z={-160}>
@@ -396,14 +392,6 @@ const S12Warning: React.FC<SceneProps> = ({ dur }) => {
       <Layer z={140}>
         <Turtle x={340} y={170} scale={0.9} phase={0.7} />
       </Layer>
-      <Say
-        name="दादी कछुई"
-        colour="#5f7f45"
-        text="जाल में जितना हिलोगे, उतना उलझोगे। शांत रहना, और रास्ता ढूँढना।"
-        x={110}
-        y={70}
-        w={920}
-      />
       <Vignette strength={0.5} />
     </Stage>
   );
@@ -415,7 +403,7 @@ const S13Storm: React.FC<SceneProps> = ({ dur }) => {
   const c = cam(frame, dur);
   const drop = interpolate(frame, [10, 90], [-700, 60], { extrapolateRight: "clamp" });
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<><Narr text="उस रात जाल चट्टानों पर गिरा।" /></>}>
       <Sea mood="storm" />
       <Bubbles n={30} speed={1.6} />
       <Layer z={0}>
@@ -424,7 +412,6 @@ const S13Storm: React.FC<SceneProps> = ({ dur }) => {
         <Fish x={90} y={150} scale={0.5} colour="#f7c948" phase={1.7} />
         <Fish x={-30} y={190} scale={0.45} colour={theme.teal} phase={2.9} />
       </Layer>
-      <Narr text="उस रात जाल चट्टानों पर गिरा।" />
       <Vignette strength={0.7} />
     </Stage>
   );
@@ -435,21 +422,20 @@ const S14Trapped: React.FC<SceneProps> = ({ dur }) => {
   const frame = useCurrentFrame();
   const c = cam(frame, dur);
   return (
-    <Stage {...c}>
-      <Sea mood="storm" />
-      <Bubbles n={24} speed={1.4} />
-      <Layer z={0}>
-        <Net y={90} rotate={3} />
-        <Fish x={40} y={140} scale={0.62} stripe phase={0.6} />
-      </Layer>
-      <Say
+    <Stage {...c} ui={<><Say
         name="चिमटी"
         colour={theme.coralDeep}
         text="मोती! मैं फँस गई! रस्सी मेरे पंखों में उलझ गई है!"
-        x={110}
-        y={70}
+        x={140}
+        y={104}
         w={880}
-      />
+      /></>}>
+      <Sea mood="storm" />
+      <Bubbles n={24} speed={1.4} />
+      <Layer z={0}>
+        <Net y={104} rotate={3} />
+        <Fish x={40} y={140} scale={0.62} stripe phase={0.6} />
+      </Layer>
       <Vignette strength={0.68} />
     </Stage>
   );
@@ -460,7 +446,14 @@ const S15Flee: React.FC<SceneProps> = ({ dur }) => {
   const frame = useCurrentFrame();
   const c = cam(frame, dur);
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<><Say
+        name="टूथू"
+        colour={theme.rockLight}
+        text="मैं यहाँ नहीं रुकता। यह जाल मेरे दाँतों से बड़ा है!"
+        x={140}
+        y={104}
+        w={860}
+      /></>}>
       <Sea mood="storm" />
       <Bubbles n={22} speed={1.3} />
       <Layer z={-100}>
@@ -469,14 +462,6 @@ const S15Flee: React.FC<SceneProps> = ({ dur }) => {
       <Layer z={180}>
         <Barracuda x={260} y={-30} scale={0.9} phase={0.8} />
       </Layer>
-      <Say
-        name="टूथू"
-        colour={theme.rockLight}
-        text="मैं यहाँ नहीं रुकता। यह जाल मेरे दाँतों से बड़ा है!"
-        x={110}
-        y={80}
-        w={860}
-      />
       <Vignette strength={0.66} />
     </Stage>
   );
@@ -487,7 +472,13 @@ const S16Plan: React.FC<SceneProps> = ({ dur }) => {
   const frame = useCurrentFrame();
   const c = cam(frame, dur);
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<><Say
+        name="मोती"
+        text="मेरे पास हड्डियाँ नहीं हैं। जिस छेद से मछली नहीं निकले, उससे मैं निकलूँगा।"
+        x={140}
+        y={104}
+        w={900}
+      /></>}>
       <Sea mood="dusk" />
       <Bubbles n={20} />
       <Layer z={-200}>
@@ -496,13 +487,6 @@ const S16Plan: React.FC<SceneProps> = ({ dur }) => {
       <Layer z={160}>
         <Octo x={-430} y={220} scale={0.85} mood="calm" />
       </Layer>
-      <Say
-        name="मोती"
-        text="मेरे पास हड्डियाँ नहीं हैं। जिस छेद से मछली नहीं निकले, उससे मैं निकलूँगा।"
-        x={110}
-        y={70}
-        w={900}
-      />
       <Vignette strength={0.46} />
     </Stage>
   );
@@ -515,7 +499,7 @@ const S17Squeeze: React.FC<SceneProps> = ({ dur }) => {
   const flat = interpolate(frame, [20, 70], [0, 0.92], { extrapolateRight: "clamp" });
   const x = interpolate(frame, [30, 150], [-560, 330], { extrapolateRight: "clamp" });
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<><Narr text="मोती रस्सी जैसा पतला होकर अंदर सरक गया।" /></>}>
       <Sea mood="dusk" />
       <Bubbles n={18} />
       <Layer z={-200}>
@@ -524,7 +508,6 @@ const S17Squeeze: React.FC<SceneProps> = ({ dur }) => {
       <Layer z={160}>
         <Octo x={x} y={230} scale={0.8} mood="calm" flat={flat} />
       </Layer>
-      <Narr text="मोती रस्सी जैसा पतला होकर अंदर सरक गया।" />
       <Vignette strength={0.5} />
     </Stage>
   );
@@ -536,7 +519,7 @@ const S18Inside: React.FC<SceneProps> = ({ dur }) => {
   const c = cam(frame, dur);
   const torch = 0.35 + 0.25 * Math.sin(frame / 26);
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<><Say name="मोती" text="अंधेरा था। मैंने हाथों से गाँठ पहचानी। हर गाँठ का एक सिरा होता है।" x={140} y={104} w={940} /></>}>
       <Sea mood="storm" />
       <Bubbles n={14} speed={0.8} />
       <Layer z={-100}>
@@ -558,7 +541,6 @@ const S18Inside: React.FC<SceneProps> = ({ dur }) => {
           }}
         />
       </Layer>
-      <Say name="मोती" text="अंधेरा था। मैंने हाथों से गाँठ पहचानी। हर गाँठ का एक सिरा होता है।" x={110} y={70} w={940} />
       <Vignette strength={0.82} />
     </Stage>
   );
@@ -573,7 +555,7 @@ const S19Colour: React.FC<SceneProps> = ({ dur }) => {
     extrapolateRight: "clamp",
   });
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<><Say name="मोती" text="मैंने रंग बदला। केकड़े ने मुझे नहीं पहचाना।" x={140} y={104} w={840} /></>}>
       <Sea mood="dusk" />
       <Bubbles n={18} />
       <Layer z={-200}>
@@ -587,7 +569,6 @@ const S19Colour: React.FC<SceneProps> = ({ dur }) => {
       <Layer z={260}>
         <Crab x={420} y={-30} scale={0.8} />
       </Layer>
-      <Say name="मोती" text="मैंने रंग बदला। केकड़े ने मुझे नहीं पहचाना।" x={110} y={70} w={840} />
       <Vignette strength={0.5} />
     </Stage>
   );
@@ -598,7 +579,7 @@ const S20ArmsWork: React.FC<SceneProps> = ({ dur }) => {
   const frame = useCurrentFrame();
   const c = cam(frame, dur);
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<><Say name="मोती" text="आठ हाथ, आठ काम। दो ने रस्सी पकड़ी, दो ने गाँठ खोली।" x={140} y={104} w={880} /></>}>
       <Sea mood="dusk" />
       <Bubbles n={20} />
       <Layer z={-150}>
@@ -607,7 +588,6 @@ const S20ArmsWork: React.FC<SceneProps> = ({ dur }) => {
       <Layer z={180}>
         <Octo y={250} scale={1.0} mood="calm" />
       </Layer>
-      <Say name="मोती" text="आठ हाथ, आठ काम। दो ने रस्सी पकड़ी, दो ने गाँठ खोली।" x={110} y={70} w={880} />
       <Vignette strength={0.48} />
     </Stage>
   );
@@ -619,7 +599,7 @@ const S21HeartsWork: React.FC<SceneProps> = ({ dur }) => {
   const c = cam(frame, dur);
   const glow = 0.35 + 0.25 * Math.abs(Math.sin(frame / 9));
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<><Narr text="तीनों दिल ज़ोर से धड़के — वह थका नहीं।" /></>}>
       <Sea mood="dusk" />
       <Bubbles n={22} />
       <Layer z={100}>
@@ -641,7 +621,6 @@ const S21HeartsWork: React.FC<SceneProps> = ({ dur }) => {
         <Heart x={960} y={300} size={110} delay={4} colour="#ef4444" />
         <Heart x={1060} y={260} size={100} delay={8} colour="#ef4444" />
       </Layer>
-      <Narr text="तीनों दिल ज़ोर से धड़के — वह थका नहीं।" />
       <Vignette strength={0.46} />
     </Stage>
   );
@@ -654,7 +633,7 @@ const S22Pulling: React.FC<SceneProps> = ({ dur }) => {
   const lift = interpolate(frame, [0, dur], [110, -420]);
   const shake = Math.sin(frame / 3) * 6;
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<><Narr text="तभी जाल ऊपर खिंचने लगा। मोती के पास कुछ ही पल थे।" /></>}>
       <Sea mood="storm" />
       <Bubbles n={40} speed={2.4} />
       <Layer z={0}>
@@ -663,7 +642,6 @@ const S22Pulling: React.FC<SceneProps> = ({ dur }) => {
         <Fish x={120 - shake} y={160} scale={0.5} colour="#f7c948" phase={2.2} />
         <Fish x={10} y={205} scale={0.45} colour={theme.teal} phase={3.1} />
       </Layer>
-      <Narr text="तभी जाल ऊपर खिंचने लगा। मोती के पास कुछ ही पल थे।" />
       <Vignette strength={0.75} />
     </Stage>
   );
@@ -675,7 +653,14 @@ const S23Free: React.FC<SceneProps> = ({ dur }) => {
   const c = cam(frame, dur);
   const hop = Math.abs(Math.sin(frame / 12)) * 26;
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<><Say
+        name="चिमटी"
+        colour={theme.coralDeep}
+        text="मैं निकल गई! मोती, तुम अजीब नहीं हो!"
+        x={140}
+        y={104}
+        w={820}
+      /></>}>
       <Sea mood="day" />
       <Bubbles n={30} />
       <Layer z={-120}>
@@ -684,14 +669,6 @@ const S23Free: React.FC<SceneProps> = ({ dur }) => {
       <Layer z={140}>
         <Octo x={-320} y={240} scale={0.95} mood="happy" />
       </Layer>
-      <Say
-        name="चिमटी"
-        colour={theme.coralDeep}
-        text="मैं निकल गई! मोती, तुम अजीब नहीं हो!"
-        x={110}
-        y={70}
-        w={820}
-      />
       <Vignette strength={0.36} />
     </Stage>
   );
@@ -702,7 +679,14 @@ const S24Sorry: React.FC<SceneProps> = ({ dur }) => {
   const frame = useCurrentFrame();
   const c = cam(frame, dur);
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<><Say
+        name="टूथू"
+        colour={theme.rockLight}
+        text="माफ़ी माँगता हूँ। तुम्हारे तीन दिलों ने वह किया, जो मेरे दाँत नहीं कर सके।"
+        x={140}
+        y={104}
+        w={900}
+      /></>}>
       <Sea mood="day" />
       <Bubbles n={22} />
       <Layer z={120}>
@@ -711,14 +695,6 @@ const S24Sorry: React.FC<SceneProps> = ({ dur }) => {
       <Layer z={-100}>
         <Octo x={-460} y={230} scale={0.72} mood="calm" />
       </Layer>
-      <Say
-        name="टूथू"
-        colour={theme.rockLight}
-        text="माफ़ी माँगता हूँ। तुम्हारे तीन दिलों ने वह किया, जो मेरे दाँत नहीं कर सके।"
-        x={110}
-        y={70}
-        w={900}
-      />
       <Vignette strength={0.38} />
     </Stage>
   );
@@ -729,7 +705,7 @@ const S25Celebrate: React.FC<SceneProps> = ({ dur }) => {
   const frame = useCurrentFrame();
   const c = cam(frame, dur);
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<><Narr text="उस रात पूरी चट्टान गाती रही।" /></>}>
       <Sea mood="dusk" />
       <Bubbles n={40} speed={1.5} />
       <Layer z={-260}>
@@ -755,7 +731,6 @@ const S25Celebrate: React.FC<SceneProps> = ({ dur }) => {
       <Layer z={-420}>
         <Barracuda x={700} y={-330} scale={0.55} flip phase={1.9} />
       </Layer>
-      <Narr text="उस रात पूरी चट्टान गाती रही।" />
       <Vignette strength={0.44} />
     </Stage>
   );
@@ -766,7 +741,14 @@ const S26Proud: React.FC<SceneProps> = ({ dur }) => {
   const frame = useCurrentFrame();
   const c = cam(frame, dur);
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<><Say
+        name="दादी कछुई"
+        colour="#5f7f45"
+        text="तीन दिल, नीला खून, आठ हाथ। यह गलती नहीं है। यह डिज़ाइन है।"
+        x={140}
+        y={104}
+        w={900}
+      /></>}>
       <Sea mood="day" />
       <Bubbles n={24} />
       <Layer z={-120}>
@@ -775,14 +757,6 @@ const S26Proud: React.FC<SceneProps> = ({ dur }) => {
       <Layer z={140}>
         <Turtle x={340} y={170} scale={0.92} phase={1.4} />
       </Layer>
-      <Say
-        name="दादी कछुई"
-        colour="#5f7f45"
-        text="तीन दिल, नीला खून, आठ हाथ। यह गलती नहीं है। यह डिज़ाइन है।"
-        x={110}
-        y={70}
-        w={900}
-      />
       <Vignette strength={0.36} />
     </Stage>
   );
@@ -793,7 +767,7 @@ const S27Recap: React.FC<SceneProps> = ({ dur }) => {
   const frame = useCurrentFrame();
   const c = cam(frame, dur);
   return (
-    <Stage {...c}>
+    <Stage {...c} ui={<><Narr text="हर अजीब चीज़, किसी न किसी दिन, किसी की जान बचाती है।" /></>}>
       <Sea mood="dusk" />
       <Bubbles n={26} />
       <Layer z={-260}>
@@ -804,7 +778,6 @@ const S27Recap: React.FC<SceneProps> = ({ dur }) => {
       <Layer z={120}>
         <Octo y={190} scale={1.05} mood="happy" showHearts />
       </Layer>
-      <Narr text="हर अजीब चीज़, किसी न किसी दिन, किसी की जान बचाती है।" />
       <Vignette strength={0.42} />
     </Stage>
   );
