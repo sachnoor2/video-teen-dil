@@ -67,6 +67,35 @@ def envelope(path: Path, fps: int) -> str:
     return "".join(str(min(9, int(round((v / peak) * 9)))) for v in rms)
 
 
+def mix_sfx(wav: Path, cues, sfx_dir: Path, ffmpeg: str) -> None:
+    """Drop the cartoon sound effects under the line, at the cue times."""
+    if not cues:
+        return
+    inputs = [str(wav)]
+    filters = []
+    for i, cue in enumerate(cues):
+        clip = sfx_dir / f"{cue.get('s', '')}.wav"
+        if not clip.exists():
+            print(f"    ! missing sfx {clip.name}, skipped")
+            continue
+        inputs.append(str(clip))
+        delay = int(float(cue.get("t", 0)) * 1000)
+        gain = float(cue.get("g", -7))
+        filters.append(f"[{len(inputs) - 1}:a]adelay={delay}|{delay},volume={gain}dB[s{i}]")
+    if len(inputs) == 1:
+        return
+    streams = "".join(f"[s{i}]" for i in range(len(inputs) - 1))
+    fc = ";".join(filters) + f";[0:a]{streams}amix=inputs={len(inputs)}:duration=first:normalize=0[out]"
+    cmd = [ffmpeg, "-y", "-hide_banner", "-loglevel", "error"]
+    for i in inputs:
+        cmd += ["-i", i]
+    cmd += ["-filter_complex", fc, "-map", "[out]", "-ar", "22050", "-ac", "1", str(wav) + ".tmp.wav"]
+    r = subprocess.run(cmd, capture_output=True, text=True)
+    if r.returncode != 0:
+        sys.exit(f"sfx mix failed on {wav.name}: {r.stderr[:400]}")
+    Path(str(wav) + ".tmp.wav").replace(wav)
+
+
 def wav_seconds(path: Path) -> float:
     with wave.open(str(path), "rb") as f:
         return f.getnframes() / float(f.getframerate())
@@ -77,6 +106,7 @@ def main() -> int:
     ap.add_argument("--piper", required=True, help="path to the piper binary")
     ap.add_argument("--voices-dir", default=".voices", help="folder holding the .onnx voices")
     ap.add_argument("--narration", default=str(NARRATION))
+    ap.add_argument("--sfx-dir", default="public/sfx", help="folder of synthesised sound effects")
     args = ap.parse_args()
 
     if not Path(args.piper).exists():
@@ -142,6 +172,8 @@ def main() -> int:
             )
             if ff.returncode != 0 or not out.exists():
                 sys.exit(f"ffmpeg pitch shift failed on {scene_id}: {ff.stderr.decode('utf-8', 'replace')[:600]}")
+
+            mix_sfx(out, item.get("sfx"), Path(args.sfx_dir), ffmpeg)
 
             seconds = wav_seconds(out)
             frames = max(int(round(min_seconds * fps)), int(round((seconds + pad) * fps)))

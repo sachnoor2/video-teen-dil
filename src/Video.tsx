@@ -5,7 +5,7 @@ import { SCENES } from "./shots";
 import { Stage3D } from "./r3d/stage";
 import { CastMember, Prop3D } from "./r3d/cast";
 import { VoiceContext } from "./r3d/voice";
-import { Narr, Say, TitleCard } from "./ui";
+import { TitleCard } from "./ui";
 import { theme } from "./theme";
 
 const ProgressBar: React.FC = () => {
@@ -14,15 +14,20 @@ const ProgressBar: React.FC = () => {
   const p = Math.min(1, frame / Math.max(1, durationInFrames - 1));
   return (
     <AbsoluteFill style={{ pointerEvents: "none" }}>
-      <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 10, background: "rgba(3,20,34,.55)" }}>
+      <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 8, background: "rgba(3,20,34,.45)" }}>
         <div style={{ width: `${p * 100}%`, height: "100%", background: `linear-gradient(90deg, ${theme.teal}, ${theme.gold})` }} />
       </div>
     </AbsoluteFill>
   );
 };
 
-/** Splits one scene into its shots and gives each shot its own camera and cast. */
-const SceneShots: React.FC<{ sceneId: string; total: number; env: string }> = ({ sceneId, total, env }) => {
+/** One scene = one spoken line, cut into one or more camera shots. */
+const SceneShots: React.FC<{ sceneId: string; total: number; env: string; speaker: string }> = ({
+  sceneId,
+  total,
+  env,
+  speaker,
+}) => {
   const def = SCENES[sceneId];
   if (!def) return null;
   const n = def.shots.length;
@@ -38,11 +43,11 @@ const SceneShots: React.FC<{ sceneId: string; total: number; env: string }> = ({
         return (
           <Sequence key={`${sceneId}-${i}`} from={start} durationInFrames={dur} name={`${sceneId} shot ${i + 1}`}>
             <VoiceContext.Provider value={{ env, offset: start }}>
-              <Stage3D cam={shot.cam} dur={dur} mood={shot.mood}>
+              <Stage3D cam={shot.cam} dur={dur} mood={shot.mood} shake={shot.shake} punch={shot.punch}>
                 {shot.gap ? <Prop3D p={shot.gap} kind="gap" dur={dur} /> : null}
                 {shot.net ? <Prop3D p={shot.net} kind="net" dur={dur} /> : null}
                 {shot.cast.map((c, j) => (
-                  <CastMember key={j} c={c} dur={dur} />
+                  <CastMember key={j} c={c} dur={dur} speaker={speaker} />
                 ))}
               </Stage3D>
             </VoiceContext.Provider>
@@ -62,7 +67,6 @@ export const Video: React.FC = () => {
         from += scene.frames;
         const def = SCENES[scene.id];
         if (!def) return null;
-        const first = def.shots[0];
         return (
           <Sequence
             key={scene.id}
@@ -71,13 +75,8 @@ export const Video: React.FC = () => {
             name={`${scene.id} · ${scene.character} · ${scene.seconds.toFixed(1)}s`}
           >
             <Audio src={staticFile(scene.audio)} />
-            <SceneShots sceneId={scene.id} total={scene.frames} env={scene.env ?? ""} />
-            {/* text lives at scene level so a cut never interrupts a line */}
-            {first.title ? <TitleCard main={first.title.main} sub={first.title.sub} /> : null}
-            {first.bubble ? (
-              <Say name={first.bubble.name} text={first.bubble.text} colour={first.bubble.colour} tail={first.bubble.tail} />
-            ) : null}
-            {first.caption ? <Narr text={first.caption} /> : null}
+            <SceneShots sceneId={scene.id} total={scene.frames} env={scene.env ?? ""} speaker={scene.character} />
+            {def.title ? <TitleCard main={def.title.main} sub={def.title.sub} /> : null}
           </Sequence>
         );
       })}

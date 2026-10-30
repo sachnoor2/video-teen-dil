@@ -46,8 +46,11 @@ jobs:
             curl -fsSL -o .voices/hi_IN-$v-medium.onnx.json "$B/$v/medium/hi_IN-$v-medium.onnx.json"
           done
 
-      - name: Generate the five character voices, envelopes and timing manifest
-        run: python3 scripts/tts_hi.py --piper .piper/piper/piper --voices-dir .voices
+      - name: Synthesise the cartoon sound effects
+        run: python3 scripts/sfx.py --out public/sfx
+
+      - name: Generate the five character voices, envelopes, sound cues and timing manifest
+        run: python3 scripts/tts_hi.py --piper .piper/piper/piper --voices-dir .voices --sfx-dir public/sfx
 
       - name: Type-check
         run: npx tsc --noEmit

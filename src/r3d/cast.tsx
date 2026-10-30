@@ -2,11 +2,12 @@ import React from "react";
 import { interpolate, useCurrentFrame } from "remotion";
 import { Barracuda3D, Crab3D, Fish3D, Net3D, RockGap3D, Turtle3D } from "./creatures";
 import { Octo3D } from "./octopus";
+import { resolvePose } from "./rig";
 import type { CastItem, Prop } from "../shots";
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
-export const CastMember: React.FC<{ c: CastItem; dur: number }> = ({ c, dur }) => {
+export const CastMember: React.FC<{ c: CastItem; dur: number; speaker?: string }> = ({ c, dur, speaker }) => {
   const frame = useCurrentFrame();
   const t = interpolate(frame, [0, Math.max(1, dur - 1)], [0, 1], {
     extrapolateLeft: "clamp",
@@ -14,6 +15,7 @@ export const CastMember: React.FC<{ c: CastItem; dur: number }> = ({ c, dur }) =
   });
   const to = c.to ?? c.at;
   const pos: [number, number, number] = [lerp(c.at[0], to[0], t), lerp(c.at[1], to[1], t), lerp(c.at[2], to[2], t)];
+  const talking = Boolean(c.who && speaker && c.who === speaker);
 
   switch (c.kind) {
     case "octo":
@@ -21,7 +23,8 @@ export const CastMember: React.FC<{ c: CastItem; dur: number }> = ({ c, dur }) =
         <Octo3D
           position={pos}
           scale={c.scale ?? 1}
-          pose={c.pose ?? "idle"}
+          pose={resolvePose(frame, c.cues, c.rest)}
+          talking={talking}
           phase={c.phase ?? 0}
           tint={c.tint}
           hearts={c.hearts}
